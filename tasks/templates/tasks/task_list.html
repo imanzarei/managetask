@@ -1,0 +1,53 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div class="pl-4" style="padding-left: 40px; ">
+    <h1 class="text-left mb-3">Task list</h1>
+</div>
+    <div class="container mt-5">
+        <div class="row mb-3">
+            <div class="col">
+                <input type="text" size="80px" id="searchInput" placeholder="Search by title or description">
+                <button id="searchButton" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+        <ul id="task-list" class="list-group"></ul>
+    </div>
+
+<script>
+        $(document).ready(function() {
+            function searchTasks(searchTerm) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/task/list/?search=' + searchTerm,
+                    success: function(response) {
+                        $('#task-list').empty(); // Clear the existing task list
+                        response.forEach(function(item) {
+                            var listItem = '<li class="list-group-item">';
+                            if (item.created_by === {{ request.user.id }}) {
+                                listItem += '<a href="{% url 'update_task' 0 %}' + item.id + '">' + item.title + '</a>';
+                            } else {
+                                listItem += item.title;
+                            }
+                            listItem += '</li>';
+                            $('#task-list').append(listItem);
+                        });
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        alert('Error searching for tasks. Please try again.');
+                    }
+                });
+            }
+
+            // Call searchTasks function on page load
+            searchTasks('');
+
+            $('#searchButton').click(function() {
+                var searchTerm = $('#searchInput').val();
+                searchTasks(searchTerm);
+            });
+        });
+    </script>
+
+{% endblock %}

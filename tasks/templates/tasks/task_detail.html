@@ -1,0 +1,76 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+    <div class="pl-4" style="padding-left: 40px; ">
+    <h1 class="text-left mb-4">Update Task</h1>
+    </div>
+    <div class="container mt-5">
+        <form id="updateTaskForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="hidden" class="form-control" id="task_id" name="task_iad" value="{{ task.id }}"/>
+                <label for="title">Title:</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{ task.title }}" required/>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea class="form-control" id="description" name="description"
+                          required>{{ task.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select class="form-control" id="status" name="status">
+                    <option value="TO DO" {% if task.status == "TO DO" %}selected{% endif %}>To Do</option>
+                    <option value="IN PROGRESS" {% if task.status == "IN PROGRESS" %}selected{% endif %}>In
+                        Progress
+                    </option>
+                    <option value="DONE" {% if task.status == "DONE" %}selected{% endif %}>Done</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="title">Created By:</label>
+                <input type="text" class="form-control" id="created_by" name="created_by" value="{{ task.created_by }}"
+                       required disabled/>
+            </div>
+            <div class="text-center mt-3"> <!-- Center align the buttons -->
+                <button type="submit" class="btn btn-primary mr-2">Update Task</button>
+                <a href="{% url 'task_delete' task.id %}" class="btn btn-danger mr-2">Delete</a>
+                <a href="{% url 'task_list_page' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+
+    <script>
+        $(document).ready(function () {
+
+            $('#updateTaskForm').submit(function (e) {
+                e.preventDefault();
+
+                var taskData = {
+                    'title': $('#title').val(),
+                    'description': $('#description').val(),
+                    'id': $('#task_id').val(),
+                    'status': $('#status').val(),
+                    'created_by': $('#created_by').val()
+                };
+                $.ajax({
+                    url: '/task/update/' + taskData.id + '/',
+                    method: 'PUT',
+                    data: taskData,
+                    headers: {
+                         'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    success: function (response) {
+                        console.log('Item updated successfully:', response);
+                        window.location.href = '{% url "task_list_page" %}'
+                    },
+                    error: function (error) {
+                        console.error('Error updating item:', error);
+                    }
+                });
+            });
+        });
+    </script>
+
+{% endblock %}
