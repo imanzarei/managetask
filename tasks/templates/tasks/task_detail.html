@@ -33,8 +33,10 @@
                        required disabled/>
             </div>
             <div class="text-center mt-3"> <!-- Center align the buttons -->
+                   {%  if task.created_by ==  request.user  %}
                 <button type="submit" class="btn btn-primary mr-2">Update Task</button>
                 <a href="{% url 'task_delete' task.id %}" class="btn btn-danger mr-2">Delete</a>
+                        {% endif %}
                 <a href="{% url 'task_list_page' %}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
@@ -55,7 +57,7 @@
                     'created_by': $('#created_by').val()
                 };
                 $.ajax({
-                    url: '/task/update/' + taskData.id + '/',
+                    url: '/api/update/' + taskData.id + '/',
                     method: 'PUT',
                     data: taskData,
                     headers: {

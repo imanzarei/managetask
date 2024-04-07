@@ -1,16 +1,9 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
-from .views import task_list, create_task, update_task, delete_task, task_list_page, \
-    task_form_page, task_detail_page, \
-    task_delete_page, login_page, logout_page
+from .views import task_list_page, task_form_page, task_detail_page, task_delete_page, login_page, logout_page
 
 urlpatterns = [
-    path('list/', task_list, ),
-    path('create/', create_task),
-    path('update/<int:pk>/', update_task),
-    path('delete/<int:pk>/', delete_task),
-
     path('accounts/login/', login_page, name='login_page'),  # Redirect /accounts/login to the login_page view
     path('accounts/logout/', logout_page, name='logout_page'),
     path('accounts/', include('django.contrib.auth.urls')),

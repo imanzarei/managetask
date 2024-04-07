@@ -1,44 +1,51 @@
 {% extends 'tasks/base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-<div class="pl-4" style="padding-left: 40px; ">
-    <h1 class="text-left mb-4">Delete Task</h1>
-</div>
-    <p>Are you sure you want to delete task name : "{{ task.title }}"?</p>
-    <form method="post" id="deleteTaskForm" class="text-center">
-        {% csrf_token %}
-        <input type="hidden" class="form-control" id="task_id" name="task_id" value="{{ task.id }}"/>
-        <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-danger mt-3">Yes, Delete</button>
-        <input type="button" value="Cancel" class="btn btn-secondary mt-3" onclick="history.back()" style="margin-left: 10px;"/>
+    <div class="container mt-5">
+        <div class="pl-4" style="padding-left: 40px; ">
+            <h1 class="text-left mb-4">Delete Task</h1>
         </div>
-    </form>
-    <script>
-        $(document).ready(function () {
+        {% if task.created_by ==  request.user %}
 
-            $('#deleteTaskForm').submit(function (e) {
-                e.preventDefault();
-                var formData = {
-                    'id': $('#task_id').val(),
-                };
+            <p>Are you sure you want to delete task name : "{{ task.title }}"?</p>
+        {% else %}
+            <p style="color: red">You have not permission to delete this task : "{{ task.title }}"</p>
+        {% endif %}
+        <form method="post" id="deleteTaskForm" class="text-center">
+            {% csrf_token %}
+            <input type="hidden" class="form-control" id="task_id" name="task_id" value="{{ task.id }}"/>
+            <div class="d-flex justify-content-center">
+                {% if task.created_by == request.user %}
+                    <button type="submit" class="btn btn-danger mt-3">Yes, Delete</button>
+                {% endif %}
+                <a href="{% url 'task_list_page' %}" class="btn btn-secondary mt-3 ml-2">Cancel</a>
+            </div>
+        </form>
+        <script>
+            $(document).ready(function () {
 
-                $.ajax({
-                    url: '/task/delete/' + formData.id + '/',
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    success: function (response) {
-                        console.log('Task deleted successfully:', response);
-                        window.location.href = '{% url "task_list_page" %}'
-                    },
-                    error: function (error) {
-                        console.error('Error deleting task:', error);
-                    }
+                $('#deleteTaskForm').submit(function (e) {
+                    e.preventDefault();
+                    var formData = {
+                        'id': $('#task_id').val(),
+                    };
+
+                    $.ajax({
+                        url: '/api/delete/' + formData.id + '/',
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        success: function (response) {
+                            console.log('Task deleted successfully:', response);
+                            window.location.href = '{% url "task_list_page" %}'
+                        },
+                        error: function (error) {
+                            console.error('Error deleting task:', error);
+                        }
+                    });
                 });
             });
-        });
-    </script>
-</div>
+        </script>
+    </div>
 {% endblock %}

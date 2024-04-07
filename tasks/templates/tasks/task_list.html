@@ -19,16 +19,12 @@
             function searchTasks(searchTerm) {
                 $.ajax({
                     type: 'GET',
-                    url: '/task/list/?search=' + searchTerm,
+                    url: '/api/list/?search=' + searchTerm,
                     success: function(response) {
                         $('#task-list').empty(); // Clear the existing task list
                         response.forEach(function(item) {
                             var listItem = '<li class="list-group-item">';
-                            if (item.created_by === {{ request.user.id }}) {
                                 listItem += '<a href="{% url 'update_task' 0 %}' + item.id + '">' + item.title + '</a>';
-                            } else {
-                                listItem += item.title;
-                            }
                             listItem += '</li>';
                             $('#task-list').append(listItem);
                         });
